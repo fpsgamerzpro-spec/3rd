@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Ring Game 💍 | For Anu 💗</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>💍</text></svg>" />
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+  <canvas id="hearts-canvas"></canvas>
+
+  <header class="topbar">
+    <a class="brand" href="index.html">Anu<span class="pink"> 💗 </span>Us</a>
+    <nav class="nav">
+      <a href="index.html">Home</a>
+      <a href="story.html">Our Story</a>
+      <a href="gallery.html">Gallery</a>
+      <a href="game.html">Ring Game</a>
+      <a href="review.html">Rate Me</a>
+      <a href="letter.html">Letter</a>
+    </nav>
+  </header>
+
+  <main class="page">
+    <section class="hero">
+      <span class="kicker">page 4 · the ring game</span>
+      <h1 class="title">catch hearts,<br /><span class="grad">win your ring 💍</span></h1>
+      <p class="subtitle">Catch 10 falling hearts to unlock the proposal. Then drag the ring onto her finger — she's waiting. 🥺</p>
+    </section>
+
+    <section class="game-area mt-3">
+      <div class="hud">
+        <span class="pill">score: <b id="score">0</b> / 10</span>
+        <span class="pill">⏱ <b id="time">30</b>s</span>
+        <span class="pill" id="lives">💗💗💗</span>
+      </div>
+
+      <!-- STAGE 1: heart catch -->
+      <div id="stage-catch">
+        <canvas id="catchCanvas" width="800" height="420"></canvas>
+        <p class="wear-note">move with your mouse / finger (or ← → keys) · catch 💗 hearts · dodge 💔 broken ones</p>
+        <div class="center mt-2">
+          <button class="btn" id="startBtn">start game ▶</button>
+        </div>
+      </div>
+
+      <!-- STAGE 2: wear the ring -->
+      <div class="stage hidden" id="stage-wear">
+        <div class="hand-scene">
+          <div class="hand" id="hand">
+            <div class="palm"></div>
+            <div class="finger f1"></div>
+            <div class="finger f2"></div>
+            <div class="finger f3"></div>
+            <div class="finger f4"></div>
+            <div class="thumb"></div>
+            <div class="ring-slot" id="ringSlot">drop ring here</div>
+          </div>
+        </div>
+        <p class="wear-note">drag the ring onto the ring finger 💌</p>
+      </div>
+
+      <!-- STAGE 3: proposal -->
+      <div class="stage hidden" id="stage-final">
+        <div class="locked" style="padding:20px 0">
+          <div class="big">💍😭💗</div>
+          <h2 class="section-title">SHE SAID YES!!!</h2>
+          <p class="muted" style="max-width:520px;margin:10px auto 0;line-height:1.9">
+            Anu, my cutey bachi chotpoti — 3 months down, forever to go.
+            You just won the only ring I can afford right now (a digital one, I'm 12-year-old-anniversary-budget broke),
+            but one day I'm putting a real one on that finger. Promise. 🤍
+          </p>
+          <div class="mt-3" style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap">
+            <a class="btn" href="letter.html">read your letter 💌</a>
+            <button class="btn ghost" id="againBtn">play again 🔁</button>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    made with <span class="pink">💗</span> + too much css · for <b>Anushree</b> · happy 3rd month anniversary baby
+  </footer>
+
+  <script src="js/app.js"></script>
+  <script>
+    /* ════════ stage 1: heart catcher ════════ */
+    const cv = document.getElementById("catchCanvas");
+    const ctx = cv.getContext("2d");
+    const scoreEl = document.getElementById("score");
+    const timeEl = document.getElementById("time");
+    const livesEl = document.getElementById("lives");
+    const TARGET = 10, TIME = 30;
+
+    let running = false, score = 0, lives = 3, timeLeft = TIME;
+    let items = [], raf = null, spawnTimer = null, clockTimer = null;
+    const basket = { x: cv.width / 2, w: 92, h: 26 };
+
+    /* ── basket control: pointer (mouse/touch) + arrow keys ── */
+    function clampX(x) {
+      return Math.max(basket.w / 2 + 4, Math.min(cv.width - basket.w / 2 - 4, x));
+    }
+    function canvasX(clientX) {
+      const r = cv.getBoundingClientRect();
+      return (clientX - r.left) * (cv.width / r.width);
+    }
+    cv.addEventListener("pointermove", e => { basket.x = clampX(canvasX(e.clientX)); });
+    cv.addEventListener("pointerdown", e => { basket.x = clampX(canvasX(e.clientX)); });
+    addEventListener("keydown", e => {
+      if (e.key === "ArrowLeft") basket.x = clampX(basket.x - 36);
+      if (e.key === "ArrowRight") basket.x = clampX(basket.x + 36);
+    });
+
+    function drawBasket() {
+      ctx.clearRect(0, 0, cv.width, cv.height);
+      // subtle grid
+      ctx.fillStyle = "rgba(255,255,255,0.03)";
+      for (let y = 0; y < cv.height; y += 40) ctx.fillRect(0, y, cv.width, 1);
+      // basket = open hand
+      ctx.save();
+      ctx.translate(basket.x - basket.w / 2, cv.height - basket.h - 6);
+      ctx.fillStyle = "rgba(255,110,169,0.9)";
+      ctx.beginPath();
+      ctx.roundRect ? ctx.roundRect(0, 0, basket.w, basket.h, 13) : ctx.rect(0, 0, basket.w, basket.h);
+      ctx.fill();
+      ctx.fillStyle = "#fff";
+      ctx.font = "16px Poppins, sans-serif";
+      ctx.fillText("🤲", basket.w / 2 - 10, -4);
+      ctx.restore();
+      // hearts
+      for (const it of items) drawItem(it);
+      // hud text
+      if (!running) {
+        ctx.fillStyle = "rgba(255,255,255,0.85)";
+        ctx.font = "700 26px Poppins, sans-serif";
+        ctx.textAlign = "center";
+        ctx.fillText(score >= TARGET ? "🎉 unlocked!" : "press start, my love 💗", cv.width / 2, cv.height / 2 - 10);
+        ctx.font = "14px Poppins, sans-serif";
+        ctx.fillStyle = "rgba(255,255,255,0.55)";
+        ctx.fillText("move with mouse or finger", cv.width / 2, cv.height / 2 + 20);
+        ctx.textAlign = "start";
+      }
+    }
+
+    function drawItem(it) {
+      ctx.font = it.s + "px serif";
+      ctx.textAlign = "center";
+      ctx.fillText(it.type, it.x, it.y);
+      ctx.textAlign = "start";
+    }
+
+    function spawn() {
+      const good = Math.random() > 0.22;
+      items.push({
+        x: 30 + Math.random() * (cv.width - 60),
+        y: -20,
+        v: 1.6 + Math.random() * 2.1 + score * 0.06,
+        s: 22 + Math.random() * 10,
+        type: good ? "💗" : "💔"
+      });
+    }
+
+    function loop() {
+      if (!running) return;
+      ctx.clearRect(0, 0, cv.width, cv.height);
+      ctx.fillStyle = "rgba(255,255,255,0.03)";
+      for (let y = 0; y < cv.height; y += 40) ctx.fillRect(0, y, cv.width, 1);
+
+      items.forEach(it => { it.y += it.v; });
+      // collisions
+      const catchY = cv.height - basket.h - 10;
+      items = items.filter(it => {
+        if (it.y > catchY && it.y < catchY + 40 && Math.abs(it.x - basket.x) < basket.w / 2 + 10) {
+          if (it.type === "💗") {
+            score++;
+            scoreEl.textContent = score;
+            popText("+" + score, cv.width / 2, catchY - 30);
+            if (score >= TARGET) return false;
+          } else {
+            lives--;
+            livesEl.textContent = "💗".repeat(Math.max(0, lives));
+            popText("ouch 💔", cv.width / 2, catchY - 30);
+            if (lives <= 0) endGame(false);
+          }
+          return false;
+        }
+        return it.y < cv.height + 30;
+      });
+      for (const it of items) drawItem(it);
+
+      // basket
+      ctx.save();
+      ctx.translate(basket.x - basket.w / 2, cv.height - basket.h - 6);
+      ctx.fillStyle = "rgba(255,110,169,0.9)";
+      ctx.beginPath();
+      ctx.roundRect ? ctx.roundRect(0, 0, basket.w, basket.h, 13) : ctx.rect(0, 0, basket.w, basket.h);
+      ctx.fill();
+      ctx.font = "20px serif";
+      ctx.textAlign = "center";
+      ctx.fillText("🤲", basket.w / 2, basket.h - 6);
+      ctx.restore();
+      ctx.textAlign = "start";
+
+      if (score >= TARGET) { endGame(true); return; }
+      raf = requestAnimationFrame(loop);
+    }
+
+    function popText(txt, x, y) {
+      const p = document.createElement("div");
+      p.className = "pop";
+      p.textContent = txt;
+      p.style.left = (cv.getBoundingClientRect().left + x) + "px";
+      p.style.top = (cv.getBoundingClientRect().top + y) + "px";
+      document.body.appendChild(p);
+      setTimeout(() => p.remove(), 1000);
+    }
+
+    function startGame() {
+      running = true; score = 0; lives = 3; timeLeft = TIME;
+      items = [];
+      scoreEl.textContent = 0;
+      livesEl.textContent = "💗💗💗";
+      timeEl.textContent = TIME;
+      spawnTimer = setInterval(spawn, 620);
+      clockTimer = setInterval(() => {
+        timeLeft--;
+        timeEl.textContent = timeLeft;
+        if (timeLeft <= 0) endGame(score >= TARGET);
+      }, 1000);
+      loop();
+    }
+
+    function endGame(won) {
+      running = false;
+      clearInterval(spawnTimer); clearInterval(clockTimer);
+      cancelAnimationFrame(raf);
+      drawBasket();
+      if (won) setTimeout(showWearStage, 700);
+      else {
+        document.getElementById("startBtn").style.display = ""; // allow retry
+        ctx.fillStyle = "rgba(255,255,255,0.9)";
+        ctx.font = "700 26px Poppins, sans-serif";
+        ctx.textAlign = "center";
+        ctx.fillText("💔 out of lives — try again?", cv.width / 2, cv.height / 2 - 10);
+        ctx.font = "14px Poppins, sans-serif";
+        ctx.fillText("press start, bachi 💗", cv.width / 2, cv.height / 2 + 20);
+        ctx.textAlign = "start";
+      }
+    }
+
+    function showWearStage() {
+      confetti(70);
+      document.getElementById("stage-catch").classList.add("hidden");
+      document.getElementById("stage-wear").classList.remove("hidden");
+      initWear();
+    }
+
+    /* ════════ stage 2: drag ring onto finger ════════ */
+    function initWear() {
+      const scene = document.querySelector(".hand-scene");
+      const slot = document.getElementById("ringSlot");
+      const ring = document.createElement("div");
+      ring.className = "ring-drag";
+      ring.innerHTML = '💍';
+      ring.style.fontSize = "64px";
+      ring.style.textAlign = "center";
+      ring.style.lineHeight = "88px";
+      ring.style.left = "8%";
+      ring.style.bottom = "12%";
+      scene.appendChild(ring);
+
+      function center(r) {
+        const b = r.getBoundingClientRect();
+        return { x: b.left + b.width / 2, y: b.top + b.height / 2 };
+      }
+
+      function onDragEnd() {
+        const rc = center(ring), sc = center(slot);
+        if (Math.hypot(rc.x - sc.x, rc.y - sc.y) < 70) {
+          ring.remove();
+          slot.textContent = "💍";
+          slot.style.border = "none";
+          slot.style.animation = "popUp .8s ease";
+          showFinal();
+        }
+      }
+
+      // pointer events (mouse + touch)
+      let dragging = false, offX = 0, offY = 0;
+      ring.addEventListener("pointerdown", e => {
+        dragging = true;
+        try { ring.setPointerCapture(e.pointerId); } catch (_) { /* not available on this element — fallback below */ }
+        const b = ring.getBoundingClientRect();
+        offX = e.clientX - (b.left + b.width / 2);
+        offY = e.clientY - (b.top + b.height / 2);
+        e.preventDefault();
+      });
+      ring.addEventListener("pointermove", e => {
+        if (!dragging) return;
+        const sb = scene.getBoundingClientRect();
+        ring.style.left = (e.clientX - sb.left - offX - ring.offsetWidth / 2) + "px";
+        ring.style.top = (e.clientY - sb.top - offY - ring.offsetHeight / 2) + "px";
+        ring.style.bottom = "auto";
+        e.preventDefault();
+      });
+      ring.addEventListener("pointerup", () => { dragging = false; onDragEnd(); });
+      ring.addEventListener("pointercancel", () => { dragging = false; });
+      document.addEventListener("pointerup", () => { if (!dragging) return; dragging = false; }, { once: true });
+      document.addEventListener("pointercancel", () => { if (!dragging) return; dragging = false; }, { once: true });
+    }
+
+    function showFinal() {
+      confetti(160);
+      localStorage.setItem("anu_ring_won", "1"); // unlocks the letter page
+      document.getElementById("stage-wear").classList.add("hidden");
+      document.getElementById("stage-final").classList.remove("hidden");
+      sendToDiscord({
+        username: "Anu's Ring Game 💍",
+        embeds: [{
+          title: "💍 SHE WON THE RING!",
+          description: "Anu caught 10 hearts and made me put the ring on her finger 🥺💗\n3rd month anniversary unlocked.",
+          color: 0xff6ea9,
+          footer: { text: "ring game · " + new Date().toLocaleString() }
+        }]
+      });
+    }
+
+    document.getElementById("startBtn").addEventListener("click", () => {
+      document.getElementById("startBtn").style.display = "none";
+      startGame();
+    });
+    document.getElementById("againBtn").addEventListener("click", () => location.reload());
+
+    drawBasket();
+  </script>
+</body>
+</html>

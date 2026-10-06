@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Gallery | For Anu 💗</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>💗</text></svg>" />
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+  <canvas id="hearts-canvas"></canvas>
+
+  <header class="topbar">
+    <a class="brand" href="index.html">Anu<span class="pink"> 💗 </span>Us</a>
+    <nav class="nav">
+      <a href="index.html">Home</a>
+      <a href="story.html">Our Story</a>
+      <a href="gallery.html">Gallery</a>
+      <a href="game.html">Ring Game</a>
+      <a href="review.html">Rate Me</a>
+      <a href="letter.html">Letter</a>
+    </nav>
+  </header>
+
+  <main class="page">
+    <section class="hero">
+      <span class="kicker">page 3 · gallery</span>
+      <h1 class="title">my favourite <span class="grad">view in the world</span></h1>
+      <p class="subtitle">11 frames of you. Tap any photo to see it big — and tell me which one is your favourite. (It's all of them, right? 😌)</p>
+    </section>
+
+    <section class="gal mt-3" id="gal">
+      <!-- ✏️ captions live here — edit text to taste -->
+      <figure><img loading="lazy" src="assets/photos/p09.jpg" alt="Anu smiling softly with a flower behind her ear" /><figcaption>that smile &gt; everything ☀️</figcaption></figure>
+      <figure><img loading="lazy" src="assets/photos/p03.jpg" alt="Anu in a red saree sitting under a heart-shaped flower arch" /><figcaption>red saree, stolen heart 💃❤️</figcaption></figure>
+      <figure><img loading="lazy" src="assets/photos/p05.jpg" alt="close-up of Anu's eyes covered in butterfly stickers" /><figcaption>butterfly eyes 🦋✨</figcaption></figure>
+      <figure><img loading="lazy" src="assets/photos/p07.jpg" alt="Anu with hello kitty stickers all over her face" /><figcaption>hello kitty girl 🐱🎀</figcaption></figure>
+      <figure><img loading="lazy" src="assets/photos/p01.png" alt="Anu with a pink flower in her hair and a People by Libianca music card" /><figcaption>flower in your hair, People on loop 🌸🎧</figcaption></figure>
+      <figure><img loading="lazy" src="assets/photos/p10.jpg" alt="Anu resting her cheek on her hand, film-poster style with black bars" /><figcaption>vintage film girlie 🎞️❤️</figcaption></figure>
+      <figure><img loading="lazy" src="assets/photos/p04.jpg" alt="screenshot of little Anu in a pink dress with mehndi on her face" /><figcaption>baby anu 🥺 (mini chotpoti!)</figcaption></figure>
+      <figure><img loading="lazy" src="assets/photos/p08.jpg" alt="Anu with kitty stickers and a Night Changes by One Direction music card" /><figcaption>Night Changes + kitty stickers 🐱🎶</figcaption></figure>
+      <figure><img loading="lazy" src="assets/photos/p06.jpg" alt="black and white photo of only Anu's eyes" /><figcaption>black &amp; white, full of colour 🖤🤍</figcaption></figure>
+      <figure><img loading="lazy" src="assets/photos/p02.png" alt="Anu with a chain necklace and a Nodivalandava music card" /><figcaption>Nodivalandava on repeat 🎧🤍</figcaption></figure>
+      <figure><img loading="lazy" src="assets/photos/p11.jpg" alt="Anu asleep on her bed in a green patterned kurti" /><figcaption>napping like it's a full-time job 😴💚</figcaption></figure>
+    </section>
+
+    <section class="card mt-3 center">
+      <div class="section-title">which one is <span>your favourite?</span></div>
+      <p class="muted">tap a number and it flies straight to my discord 💌</p>
+      <div class="mt-2" id="fav-row" style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap;">
+      </div>
+      <p class="status" id="fav-status"></p>
+    </section>
+  </main>
+
+  <div id="lightbox">
+    <button class="lb-x" aria-label="close">✕</button>
+    <img alt="preview" />
+    <div class="lb-cap"></div>
+  </div>
+
+  <footer>
+    made with <span class="pink">💗</span> + too much css · for <b>Anushree</b> · happy 3rd month anniversary baby
+  </footer>
+
+  <script src="js/app.js"></script>
+  <script>
+    initLightbox();
+
+    // favourite-photo buttons → discord webhook
+    const row = document.getElementById("fav-row");
+    const figures = [...document.querySelectorAll(".gal figure")];
+
+    figures.forEach((fig, i) => {
+      const caption = fig.querySelector("figcaption")?.textContent.trim() || "";
+      const b = document.createElement("button");
+      b.className = "btn ghost";
+      b.style.padding = "9px 16px";
+      b.style.fontSize = "0.85rem";
+      b.textContent = "#" + (i + 1);
+      b.title = caption;
+      b.addEventListener("click", async () => {
+        const status = document.getElementById("fav-status");
+        status.textContent = "sending…";
+        status.className = "status";
+        const ok = await sendToDiscord({
+          username: "Anu's Gallery 💗",
+          embeds: [{
+            title: "📸 Favourite photo pick",
+            description: "She picked **photo #" + (i + 1) + "** as her favourite 🥺💗\n\n_\"" + caption + "\"_",
+            color: 0xff6ea9,
+            footer: { text: "gallery · " + new Date().toLocaleString() }
+          }]
+        });
+        status.textContent = ok ? "sent! I saw it baby 💗" : "couldn't send 😿 check internet?";
+        status.className = "status " + (ok ? "ok" : "err");
+        if (ok) confetti(40);
+      });
+      row.appendChild(b);
+    });
+  </script>
+</body>
+</html>

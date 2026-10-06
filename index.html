@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>For Anu 💗 | Happy 3 Months</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>💗</text></svg>" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+  <canvas id="hearts-canvas"></canvas>
+
+  <header class="topbar">
+    <a class="brand" href="index.html">Anu<span class="pink"> 💗 </span>Us</a>
+    <nav class="nav">
+      <a href="index.html">Home</a>
+      <a href="story.html">Our Story</a>
+      <a href="gallery.html">Gallery</a>
+      <a href="game.html">Ring Game</a>
+      <a href="review.html">Rate Me</a>
+      <a href="letter.html">Letter</a>
+    </nav>
+  </header>
+
+  <main class="page">
+    <section class="hero">
+      <span class="kicker">07.07.2026 → forever · 3rd month anniversary · 07.10.2026</span>
+      <h1 class="title">Happy 3 Months,<br /><span class="grad">my Chotpoti 💗</span></h1>
+      <p class="subtitle">A whole little website, made only for you — my Anu, my Cutey, my Bachi. Click around, play the game, win your ring. 👑</p>
+      <div class="mt-3">
+        <a class="btn" href="letter.html">Open your letter 💌</a>
+        <a class="btn ghost" href="game.html">Play &amp; win the ring 💍</a>
+      </div>
+    </section>
+
+    <section class="card mt-3 center">
+      <div class="section-title">we have been us for</div>
+      <div class="count-grid" id="together">
+        <div class="count-card"><div class="num">0</div><div class="lab">days</div></div>
+        <div class="count-card"><div class="num">00</div><div class="lab">hours</div></div>
+        <div class="count-card"><div class="num">00</div><div class="lab">minutes</div></div>
+        <div class="count-card"><div class="num">00</div><div class="lab">seconds</div></div>
+      </div>
+      <p class="muted mt-2">…and every second of it, I'd choose you again. 💞</p>
+    </section>
+
+    <section class="mt-3 center">
+      <div class="section-title">I call you <span>so many names</span></div>
+      <p class="typewrap"><span id="typeline"></span><span class="cursor"></span></p>
+      <div class="nick-grid mt-2">
+        <div class="nick-card" data-meaning="because it's just you"><div class="emoji">🌸</div><div class="name">Anu</div><div class="meaning">the original, the one &amp; only</div></div>
+        <div class="nick-card" data-meaning="obviously"><div class="emoji">🥺💗</div><div class="name">Cutey</div><div class="meaning">scientifically proven cutest</div></div>
+        <div class="nick-card" data-meaning="my little troublemaker"><div class="emoji">🐐💕</div><div class="name">Bachi</div><div class="meaning">my favourite little menace</div></div>
+        <div class="nick-card" data-meaning="tiny &amp; sweet"><div class="emoji">🍬</div><div class="name">Chotpoti</div><div class="meaning">small, sweet, a little spicy</div></div>
+      </div>
+      <p class="muted mt-1">tap a name… 🤫</p>
+    </section>
+
+    <section class="mt-3">
+      <div class="section-title center">a few of my favourite <span>frames of you</span></div>
+      <div class="polaroids">
+        <div class="polaroid" style="--rot:-5deg"><img src="assets/photos/p09.jpg" alt="Anu smiling softly" /><div class="cap">that smile ☀️</div></div>
+        <div class="polaroid" style="--rot:3deg"><img src="assets/photos/p07.jpg" alt="Anu covered in hello kitty stickers" /><div class="cap">hello kitty girl 🐱</div></div>
+        <div class="polaroid" style="--rot:-2deg"><img src="assets/photos/p03.jpg" alt="Anu in a red saree under a flower arch" /><div class="cap">red saree, stolen heart 💃</div></div>
+        <div class="polaroid" style="--rot:6deg"><img src="assets/photos/p01.png" alt="Anu with a pink flower in her hair" /><div class="cap">flower girl 🌸</div></div>
+      </div>
+      <p class="center muted mt-2"><a class="btn ghost" href="gallery.html">see all of them →</a></p>
+    </section>
+  </main>
+
+  <footer>
+    made with <span class="pink">💗</span> + too much css · for <b>Anushree</b> · happy 3rd month anniversary baby
+  </footer>
+
+  <script src="js/app.js"></script>
+  <script>
+    typeWriter(document.getElementById("typeline"), ANU.nicknames, 120, 1400);
+    togetherCounter(document.getElementById("together"));
+
+    // anniversary countdown chip → also show days remaining big on home
+    const daysLeft = Math.max(0, Math.ceil((ANU.anniversary - new Date()) / 864e5));
+    if (daysLeft > 0) {
+      document.querySelector(".kicker").textContent += " · only " + daysLeft + " days left 💫";
+    } else {
+      document.querySelector(".kicker").textContent = "it's our anniversary today!! happy 3 months baby 💗💍";
+      confetti(140);
+    }
+
+    // tap a nickname card → little love note
+    document.querySelectorAll(".nick-card").forEach(card => {
+      card.addEventListener("click", () => {
+        const notes = [
+          "you're my favourite notification 🔔💗",
+          "10/10 would fall for you again",
+          "you + me = the whole plot 🎬",
+          "certified cutest human alive 🏆",
+          "my heart goes dhdhdh for you 💓"
+        ];
+        alert(card.querySelector(".name").textContent + " 💗 " + card.dataset.meaning + "\n\n" + notes[Math.floor(Math.random() * notes.length)]);
+      });
+    });
+
+    // auto-confetti if today is the 7th of October
+    const today = new Date();
+    if (today.getMonth() === 9 && today.getDate() === 7) confetti(160);
+  </script>
+</body>
+</html>

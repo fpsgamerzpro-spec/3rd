@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Rate Me ⭐ | For Anu 💗</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⭐</text></svg>" />
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+  <canvas id="hearts-canvas"></canvas>
+
+  <header class="topbar">
+    <a class="brand" href="index.html">Anu<span class="pink"> 💗 </span>Us</a>
+    <nav class="nav">
+      <a href="index.html">Home</a>
+      <a href="story.html">Our Story</a>
+      <a href="gallery.html">Gallery</a>
+      <a href="game.html">Ring Game</a>
+      <a href="review.html">Rate Me</a>
+      <a href="letter.html">Letter</a>
+    </nav>
+  </header>
+
+  <main class="page">
+    <section class="hero">
+      <span class="kicker">page 5 · rate your boyfriend</span>
+      <h1 class="title">so… how am I <span class="grad">doing, baby?</span></h1>
+      <p class="subtitle">Be honest (but also I cry easily). Your stars and words fly straight to my Discord — I'll see them the second you press send. 💌</p>
+    </section>
+
+    <section class="grid cols-2 mt-3">
+      <!-- ── leave a review ── -->
+      <div class="card">
+        <div class="section-title">your <span>review</span></div>
+
+        <p class="muted mt-2" style="font-size:.85rem">1 · tap the stars</p>
+        <div class="stars-input" id="stars">
+          <span class="star" data-v="1">★</span>
+          <span class="star" data-v="2">★</span>
+          <span class="star" data-v="3">★</span>
+          <span class="star" data-v="4">★</span>
+          <span class="star" data-v="5">★</span>
+        </div>
+        <p class="status" id="star-label">no stars yet 👀</p>
+
+        <p class="muted mt-2" style="font-size:.85rem">2 · optional: tag me</p>
+        <div id="tags" style="display:flex;gap:8px;flex-wrap:wrap;margin-top:6px;">
+          <button class="btn ghost tag" style="padding:8px 14px;font-size:.8rem" data-tag="most handsome 🥰">most handsome 🥰</button>
+          <button class="btn ghost tag" style="padding:8px 14px;font-size:.8rem" data-tag="best texts 📱">best texts 📱</button>
+          <button class="btn ghost tag" style="padding:8px 14px;font-size:.8rem" data-tag="make me laugh 😂">make me laugh 😂</button>
+          <button class="btn ghost tag" style="padding:8px 14px;font-size:.8rem" data-tag="annoying sometimes 😤">annoying sometimes 😤</button>
+          <button class="btn ghost tag" style="padding:8px 14px;font-size:.8rem" data-tag="keeper 💍">keeper 💍</button>
+        </div>
+
+        <p class="muted mt-2" style="font-size:.85rem">3 · say something (anything)</p>
+        <textarea id="comment" class="mt-1" placeholder="write your honest review here, chotpoti… 💗"></textarea>
+
+        <input type="text" id="who" class="mt-2" value="Anu 💗" aria-label="your name" />
+
+        <button class="btn mt-2" id="send" style="width:100%;justify-content:center">send my review 🚀</button>
+        <p class="status" id="status"></p>
+      </div>
+
+      <!-- ── past reviews ── -->
+      <div class="card">
+        <div class="section-title">the <span>receipts</span> 📜</div>
+        <div class="avg-line">
+          <b id="avg">—</b>
+          <span id="avg-stars" class="stars-view"></span>
+          <span id="count"></span>
+        </div>
+        <div id="reviews" class="mt-2">
+          <p class="muted">no reviews yet — be the first (and please be nice) 🥺</p>
+        </div>
+        <button class="btn ghost mt-2" id="clear" style="font-size:.78rem;padding:8px 14px">clear saved reviews on this device</button>
+      </div>
+    </section>
+
+    <section class="card mt-3 center">
+      <div class="section-title">pressure is <span>real</span></div>
+      <p class="muted">every review gets delivered instantly. there is no undo. choose your stars wisely, my love. 😌💗</p>
+    </section>
+  </main>
+
+  <footer>
+    made with <span class="pink">💗</span> + too much css · for <b>Anushree</b> · happy 3rd month anniversary baby
+  </footer>
+
+  <script src="js/app.js"></script>
+  <script>
+    const KEY = "anu_reviews";
+    const stars = [...document.querySelectorAll("#stars .star")];
+    const label = document.getElementById("star-label");
+    const statusEl = document.getElementById("status");
+    let rating = 0;
+    const labels = ["", "ouch?? 💔", "hmm. acceptable 😐", "decent boyfriend ✅", "yayyy 💗", "PERFECT boyfriend 👑💗"];
+
+    function paint(n) {
+      stars.forEach((s, i) => s.classList.toggle("on", i < n));
+      label.textContent = n ? labels[n] : "no stars yet 👀";
+    }
+    stars.forEach(s => {
+      s.addEventListener("mouseenter", () => paint(+s.dataset.v));
+      s.addEventListener("mouseleave", () => paint(rating));
+      s.addEventListener("click", () => { rating = +s.dataset.v; paint(rating); });
+    });
+
+    const picked = new Set();
+    document.querySelectorAll(".tag").forEach(t => {
+      t.addEventListener("click", () => {
+        const tag = t.dataset.tag;
+        if (picked.has(tag)) { picked.delete(tag); t.style.background = ""; }
+        else { picked.add(tag); t.style.background = "rgba(255,110,169,0.25)"; }
+      });
+    });
+
+    function load() {
+      try { return JSON.parse(localStorage.getItem(KEY)) || []; } catch { return []; }
+    }
+    function render() {
+      const list = load();
+      const box = document.getElementById("reviews");
+      if (!list.length) {
+        box.innerHTML = '<p class="muted">no reviews yet — be the first (and please be nice) 🥺</p>';
+      } else {
+        box.innerHTML = list.map(r => `
+          <div class="review-item">
+            <div class="r-head">
+              <span class="r-name">${r.name}</span>
+              <span class="stars-view">${"★".repeat(r.rating)}${"☆".repeat(5 - r.rating)}</span>
+            </div>
+            ${r.tags && r.tags.length ? `<div class="mt-1" style="font-size:.78rem;color:var(--pink-2)">${r.tags.join(" · ")}</div>` : ""}
+            <div class="r-text">${r.text}</div>
+            <div class="r-date mt-1">${r.date}</div>
+          </div>`).join("");
+      }
+      if (list.length) {
+        const avg = (list.reduce((a, r) => a + r.rating, 0) / list.length).toFixed(1);
+        document.getElementById("avg").textContent = avg;
+        document.getElementById("avg-stars").textContent = "★".repeat(Math.round(avg)) + "☆".repeat(5 - Math.round(avg));
+        document.getElementById("count").textContent = list.length + " review" + (list.length > 1 ? "s" : "");
+      } else {
+        document.getElementById("avg").textContent = "—";
+        document.getElementById("avg-stars").textContent = "";
+        document.getElementById("count").textContent = "";
+      }
+    }
+
+    document.getElementById("send").addEventListener("click", async () => {
+      const text = document.getElementById("comment").value.trim();
+      const name = document.getElementById("who").value.trim() || "Anu 💗";
+      if (!rating) { statusEl.textContent = "pick stars first, naughty 😤"; statusEl.className = "status err"; return; }
+      if (text.length < 2) { statusEl.textContent = "write at least a few words 🥺"; statusEl.className = "status err"; return; }
+
+      statusEl.textContent = "flying to discord… ✈️";
+      statusEl.className = "status";
+
+      const ok = await sendToDiscord({
+        username: "Anu's Reviews ⭐",
+        embeds: [{
+          title: "⭐ New review from " + name,
+          description: `${"★".repeat(rating)}${"☆".repeat(5 - rating)}  (${rating}/5)\n\n${text}`,
+          color: 0xff6ea9,
+          fields: picked.size ? [{ name: "tags", value: [...picked].join(", ") }] : [],
+          footer: { text: "review · " + new Date().toLocaleString() }
+        }]
+      });
+
+      if (!ok) {
+        statusEl.textContent = "couldn't send 😿 check your internet and try again";
+        statusEl.className = "status err";
+        return;
+      }
+
+      const list = load();
+      list.unshift({ name, rating, text, tags: [...picked], date: new Date().toLocaleString() });
+      localStorage.setItem(KEY, JSON.stringify(list));
+      render();
+
+      statusEl.textContent = rating >= 4 ? "sent!! I'm smiling like an idiot rn 😭💗" : "sent… I respect your honesty (I'm crying) 💔";
+      statusEl.className = "status ok";
+      document.getElementById("comment").value = "";
+      picked.clear();
+      document.querySelectorAll(".tag").forEach(t => t.style.background = "");
+      confetti(rating >= 4 ? 90 : 30);
+    });
+
+    document.getElementById("clear").addEventListener("click", () => {
+      localStorage.removeItem(KEY);
+      render();
+    });
+
+    render();
+    const today = new Date();
+    if (today.getMonth() === 9 && today.getDate() === 7) confetti(140);
+  </script>
+</body>
+</html>

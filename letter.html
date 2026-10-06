@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Your Letter 💌 | For Anu 💗</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>💌</text></svg>" />
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+  <canvas id="hearts-canvas"></canvas>
+
+  <header class="topbar">
+    <a class="brand" href="index.html">Anu<span class="pink"> 💗 </span>Us</a>
+    <nav class="nav">
+      <a href="index.html">Home</a>
+      <a href="story.html">Our Story</a>
+      <a href="gallery.html">Gallery</a>
+      <a href="game.html">Ring Game</a>
+      <a href="review.html">Rate Me</a>
+      <a href="letter.html">Letter</a>
+    </nav>
+  </header>
+
+  <main class="page">
+    <section class="hero">
+      <span class="kicker">page 6 · one last thing</span>
+      <h1 class="title">a letter, <span class="grad">sealed with 3 months</span> of us</h1>
+      <p class="subtitle">You earn this one, chotpoti — win the ring and it's yours. 💍</p>
+    </section>
+
+    <!-- locked state: shown until she wins the ring on this device -->
+    <section class="card mt-3 locked" id="gate">
+      <div class="big">🔒💌</div>
+      <div class="section-title">the letter is locked</div>
+      <p style="max-width:520px;margin-inline:auto">
+        This one opens with the <b>Ring Game</b> — catch 10 hearts, then slide the ring onto my finger.
+        Win it once and it stays unlocked on this phone, forever.
+      </p>
+      <p class="mt-1" style="font-size:.85rem">no shortcuts this time, cutey. (I checked. There isn't one. 😌)</p>
+      <a class="btn mt-2" href="game.html">go win the ring 💍</a>
+    </section>
+
+    <!-- the letter: revealed only after a win -->
+    <section class="mt-3 hidden" id="letterWrap">
+      <div class="letter">
+        <div class="salut">My dearest Anu,</div>
+
+        <p>I'm not very good at saying the big things out loud, so I'm writing them down instead — where I can take my time, and where you can come back and read them on a day when you need them.</p>
+
+        <p>Three months. I still remember how nervous I was the day you said yes, and how loud my own heart sounded for the rest of that night. Nobody warned me that one person could quietly become the best part of an ordinary day — you did it without even trying.</p>
+
+        <p>It's the small things I've fallen for. The way you say my name when you're sleepy. The way your voice lifts when you're excited about something nobody else would care about. How you scold me and then worry about me two minutes later. The way you type "hmm?" and I can hear it. I keep little pieces of you like that, and I don't think I'll ever stop collecting them.</p>
+
+        <p>There are nights I stay on the call a while after you've fallen asleep, because the silence sounds like you. There are mornings I wake up and check my phone before I've even opened my eyes.</p>
+
+        <p>I know I'm not always easy. I get busy, I go quiet, I say the wrong thing at the wrong time. But even at my most distracted, you're the thought underneath everything else. If I ever make you doubt that, tell me — I'll spend the whole next month fixing it.</p>
+
+        <p>I built you this little corner of the internet because I wanted something that lasts. Flowers die. Chocolates get eaten (by me, mostly). But this stays up, with your name on it, and every page in it is something I'd never manage to say this well out loud.</p>
+
+        <p>Thank you for these three months, Anu. For the patience, the laughing at jokes that don't deserve it, the calls that went long past "okay, sleeping now", the "one more minute" that we both knew meant an hour. Knowing you has made me softer.</p>
+
+        <p>I'm not asking for anything big. Keep being you, and let me keep being the boy who loves you. Months 4, 5, 6 and everything after — I want all of them with you.</p>
+
+        <p class="sign">Happy 3rd month anniversary, my chotpoti.<br />Yours, always — and just a little bit obsessively,<br />your pagal 💗</p>
+      </div>
+      <p class="center muted mt-2">ps — you won that ring just to read this, and honestly? I'd have given it to you anyway. Now go rate me on the Rate Me page. I'm expecting 5 stars and I will be checking. 😤💕</p>
+    </section>
+  </main>
+
+  <footer>
+    made with <span class="pink">💗</span> + too much css · for <b>Anushree</b> · happy 3rd month anniversary baby
+  </footer>
+
+  <script src="js/app.js"></script>
+  <script>
+    // hard gate — no bypass, no exceptions. the win lives on this device.
+    if (ringWon()) {
+      document.getElementById("gate").classList.add("hidden");
+      document.getElementById("letterWrap").classList.remove("hidden");
+      confetti(120);
+    } else {
+      showRingGate(); // pops "play the game first 💍" right away
+    }
+  </script>
+</body>
+</html>
